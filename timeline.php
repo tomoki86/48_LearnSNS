@@ -182,8 +182,11 @@ while(true){
                             <span class="like-count">10</span>
                             <a href="#collapseComment" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
                             <span class="comment-count">コメント数：5</span>
-                            <a href="edit.php" class="btn btn-success btn-xs">編集</a>
-                            <a onclick="return confirm('ほんとに消すの？');" href="#" class="btn btn-danger btn-xs">削除</a>
+                            <?php if($signin_user['id']==$feed['user_id']):?>
+                                <a href="edit.php" class="btn btn-success btn-xs">編集</a>
+                                <a onclick="return confirm('ほんとに消すの？');" href="delete.php?feed_id=<?php echo$feed['id'];?>" class="btn btn-danger btn-xs">削除</a>
+                                <!-- get送信時はURL?キー＝値 -->
+                            <?php endif;?>
                         </div>
                         <?php include('comment_view.php'); ?>
                     </div>
