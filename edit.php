@@ -1,5 +1,30 @@
 <?php
+session_start();
+require('dbconnect.php');
 
+$sql='SELECT *FROM`users`WHERE`id`=?';
+$data=[$_SESSION['47_LearnSNS']['id']];
+$stml=$dbh->prepare($sql);
+$stml->execute($data);
+$signin_user=$stml->fetch(PDO::FETCH_ASSOC);
+
+// HTTP POST ->登録などのフオーム　formタグ
+// 　　　GET → データを取得　aタグ
+
+// getパラメーター取得
+$feed_id =$_GET['feed_id'];
+// SQL文を定義
+$sql='SELECT`f`.*,`u`.`name`,`u`.`img_name`FROM`feeds`AS`f`LEFT JOIN`users`AS`u`ON`f`.`user_id`=`u`.`id`WHERE`f`.`id`=?';
+$data=[$feed_id];
+$stml=$dbh->prepare($sql);
+$stml->execute($data);
+
+// 投稿情報を一件取得
+$feed=$stml->fetch(PDO::FETCH_ASSOC);
+
+echo'<pre>';
+var_dump($feed);
+echo'</pre>';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -16,10 +41,10 @@
         <div class="row">
             <div class="col-xs-4 col-xs-offset-4">
                 <form class="form-group" method="post" action="timeline.php">
-                    <img src="user_profile_img/misae.png" width="60">
-                    野原みさえ<br>
-                    2018-10-14<br>
-                    <textarea name="feed" class="form-control">LearnSNSの開発頑張ろう！</textarea>
+                    <img src="user_profile_img/<?php echo $feed['img_name'];?>" width="60">
+                    <?php echo $feed['name'];?><br>
+                    <?php echo $feed['created'];?><br>
+                    <textarea name="feed" class="form-control"><?php echo $feed['feed'];?></textarea>
                     <input type="submit" value="更新" class="btn btn-warning btn-xs">
                 </form>
             </div>
