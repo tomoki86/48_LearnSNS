@@ -5,7 +5,7 @@ session_start();
 require('../dbconnect.php');
 
 if (!isset($_SESSION['47_LearnSNS'])){
-    header('Location: signup.php');
+    header('Location:signup.php');
              exit();
 }
 echo '<pre>';

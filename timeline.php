@@ -11,10 +11,10 @@ if(!isset($_SESSION['47_LearnSNS']['id'])){
    exit();
 }
 $sql='SELECT *FROM`users`WHERE`id`=?';
-            $data=[$_SESSION['47_LearnSNS']['id']];
-            $stml=$dbh->prepare($sql);
-            $stml->execute($data);
-            $signin_user=$stml->fetch(PDO::FETCH_ASSOC);
+$data=[$_SESSION['47_LearnSNS']['id']];
+$stml=$dbh->prepare($sql);
+$stml->execute($data);
+$signin_user=$stml->fetch(PDO::FETCH_ASSOC);
 
 $errors=[];
 if(!empty($_POST)){
@@ -52,6 +52,7 @@ while(true){
 // var_dump($feeds);
 // echo'</pre>';
 }
+
 // FETCH（一つの行を取得すること）
 
 // 宿題
@@ -153,7 +154,7 @@ while(true){
                             <textarea name="feed" class="form-control" rows="3" placeholder="happy" style="font-size: 24px;"></textarea><br>
                             <?php if(isset($errors['feed']) && $errors['feed']== 'blank'):?>
                             <p class ="text-danger">コメントを入力してください</p>
-                        <?php endif ;?>
+                            <?php endif ;?>
                         </div>
                         <input type="submit" value="投稿する" class="btn btn-primary">
                     </form>

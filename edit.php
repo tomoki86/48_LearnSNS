@@ -10,7 +10,7 @@ $signin_user=$stml->fetch(PDO::FETCH_ASSOC);
 
 // HTTP POST ->登録などのフオーム　formタグ
 // 　　　GET → データを取得　aタグ
-
+if(isset($_GET['feed_id'])){
 // getパラメーター取得
 $feed_id =$_GET['feed_id'];
 // SQL文を定義
@@ -22,9 +22,27 @@ $stml->execute($data);
 // 投稿情報を一件取得
 $feed=$stml->fetch(PDO::FETCH_ASSOC);
 
+}
+
 echo'<pre>';
-var_dump($feed);
+var_dump($feed_id);
 echo'</pre>';
+
+// $errors=[];
+// 1 POST送信か判別
+
+if(!empty($_POST)){
+
+$sql='UPDATE `feeds`SET`feed`=?WHERE`id`=?';
+$data=[$_POST['feed'],$_POST['feed_id']];
+$stml=$dbh->prepare($sql);
+$stml->execute($data);
+
+header('Location:timeline.php');
+    exit();
+
+// $GETと$POSTを入れ替えをするとISSSET文は不要
+}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -40,11 +58,12 @@ echo'</pre>';
     <div class="container">
         <div class="row">
             <div class="col-xs-4 col-xs-offset-4">
-                <form class="form-group" method="post" action="timeline.php">
+                <form class="form-group" method="post" action="edit.php">
                     <img src="user_profile_img/<?php echo $feed['img_name'];?>" width="60">
                     <?php echo $feed['name'];?><br>
                     <?php echo $feed['created'];?><br>
                     <textarea name="feed" class="form-control"><?php echo $feed['feed'];?></textarea>
+                    <input type="hidden" name="feed_id" value="<?php echo $feed['id'];?>">
                     <input type="submit" value="更新" class="btn btn-warning btn-xs">
                 </form>
             </div>

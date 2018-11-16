@@ -4,7 +4,7 @@ require('dbconnect.php');
 $feed_id =$_GET['feed_id'];
 //$_GETでGET送信の値を受け取る
 
-// echo'<pre>';
+// echo'<pre>';o
 // var_dump($feed_id);
 // echo'</pre>';
 // die();
