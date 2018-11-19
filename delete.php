@@ -4,15 +4,15 @@ require('dbconnect.php');
 $feed_id =$_GET['feed_id'];
 //$_GETでGET送信の値を受け取る
 
-// echo'<pre>';o
+// echo'<pre>';
 // var_dump($feed_id);
 // echo'</pre>';
 // die();
 // delete処理
 $sql='DELETE FROM`feeds`WHERE`id`=?';
 $data=[$feed_id];
-$stml=$dbh->prepare($sql);
-$stml->execute($data);
+$stmt=$dbh->prepare($sql);
+$stmt->execute($data);
 // timelinephp
 header("Location: timeline.php");
 exit();
