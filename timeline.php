@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-
-
 // SQL処理
 require('dbconnect.php');
+
+const CONTENT_PER_PAGE = 5;
 //ログインしてない状態でアクセス禁止
 if(!isset($_SESSION['47_LearnSNS']['id'])){
    header('Location:signin.php');
@@ -12,9 +12,9 @@ if(!isset($_SESSION['47_LearnSNS']['id'])){
 }
 $sql='SELECT *FROM`users`WHERE`id`=?';
 $data=[$_SESSION['47_LearnSNS']['id']];
-$stml=$dbh->prepare($sql);
-$stml->execute($data);
-$signin_user=$stml->fetch(PDO::FETCH_ASSOC);
+$stmt=$dbh->prepare($sql);
+$stmt->execute($data);
+$signin_user=$stmt->fetch(PDO::FETCH_ASSOC);
 
 $errors=[];
 if(!empty($_POST)){
@@ -33,15 +33,51 @@ if(!empty($_POST)){
     $errors['feed']='blank';
   }
 }
+
+
+
+if(isset($_GET['page'])){
+    $page=$_GET['page'];
+}else{
+    $page=1;
+}
+// echo'<pre>';
+// var_dump($_GET);
+// echo'</pre>';
+
+// -1などの不正な値を渡された際の対策
+$page = max($page,1);
+//feedsテーブルのレコード数を取得する
+//COUNT()何レコードあるか集計するSQLの関数
+$sql='SELECT COUNT(*)AS `cnt`FROM`feeds`';
+$stmt=$dbh->prepare($sql);
+$stmt->execute();
+$result=$stmt->fetch(PDO::FETCH_ASSOC);
+$cnt = $result['cnt'];
+
+//最後のページ数を取得
+//最後のページ数＝取得したページ＋１ページあたりのページ数
+
+$last_page =ceil($cnt / CONTENT_PER_PAGE);
+
+//最後のページより大きい値を渡された際の対策
+$page=min($page,$last_page);
+//スキップするレコード数＝（指定ページ−１）＊表示件数
+$start=($page-1)*CONTENT_PER_PAGE;
+
+// echo'<pre>';
+// var_dump($last_page);
+// echo'</pre>';
+
 // 1投稿処理を全て取得
-$sql='SELECT `f`.*,`u`.`name`, `u`.`img_name` FROM`feeds`AS `f`LEFT JOIN`users`AS `u`ON`u`.`id`=`f`.`user_id`ORDER BY`f`.`created`DESC';
-$stml=$dbh->prepare($sql);
-$stml->execute();
+$sql='SELECT `f`.*,`u`.`name`, `u`.`img_name` FROM`feeds`AS `f`LEFT JOIN`users`AS `u`ON`u`.`id`=`f`.`user_id`ORDER BY`f`.`created`DESC LIMIT '.CONTENT_PER_PAGE.' OFFSET '.$start;
+$stmt=$dbh->prepare($sql);
+$stmt->execute();
 
 // 投稿情報を全て入れる配列定義
 $feeds=[];
 while(true){
-  $record= $stml->fetch(PDO::FETCH_ASSOC);
+  $record= $stmt->fetch(PDO::FETCH_ASSOC);
   if($record==false){
     break;
   }
@@ -49,7 +85,7 @@ while(true){
 
 
 // echo'<pre>';
-// var_dump($feeds);
+// var_dump($signin_user);
 // echo'</pre>';
 }
 
@@ -195,8 +231,16 @@ while(true){
                 <?php endforeach;?>
                 <div aria-label="Page navigation">
                     <ul class="pager">
-                        <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Newer</a></li>
-                        <li class="next disabled"><a>Older <span aria-hidden="true">&rarr;</span></a></li>
+                        <?php if ($page==1):?>
+                            <li class="previous diabled"><a><span aria-hidden="true">&larr;</span> Newer</a></li>
+                        <?php else:?>
+                             <li class="previous"><a href="timeline.php?page=<?php echo $page - 1;?>"><span aria-hidden="true">&larr;</span> Newer</a></li>
+                        <?php endif;?>
+                        <?php if ($page==$last_page):?>
+                            <li class="next dia"><a><span aria-hidden="true">&rarr;</span>Older</a></li>
+                        <?php else:?>
+                            <li class="next"><a href="timeline.php?page=<?php echo $page + 1;?>"><span aria-hidden="true">&rarr;</span>Older</a></li>
+                        <?php endif;?>
                     </ul>
                 </div>
             </div>
@@ -205,3 +249,34 @@ while(true){
 </body>
 <?php include('layouts/footer.php'); ?>
 </html>
+
+<!-- php中級
+##定数
+　定数　定まった値
+　変数　代わり得る値
+
+書き方
+ const 定数名　＝値；
+
+ 定数名は全て大文字で書くことが慣習
+ ファイルの先頭部分に書くのが慣習
+
+###組み込み関数
+max()
+ max関数は引数の中でもっとも大きな値を算出
+ $num =max(1,9);
+ $numは９となる
+ $num =(9,1)でも同じ結果
+
+min()
+ min関数は引数の中でもっとも小さな値を算出
+ $num =min(1,9);
+ $numは1となる
+ $num =(9,1)でも同じ結果
+
+ceil()
+ ceil関数は端数の切り上げを行う
+ 引数の次に大きい整数を算出
+ $num= ceil(1.9);
+ $numは２となる
+ $num= ceil(1.1)でも結果は同じ -->
