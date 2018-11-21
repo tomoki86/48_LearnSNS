@@ -65,14 +65,24 @@ $page=min($page,$last_page);
 //スキップするレコード数＝（指定ページ−１）＊表示件数
 $start=($page-1)*CONTENT_PER_PAGE;
 
-// echo'<pre>';
-// var_dump($last_page);
-// echo'</pre>';
+if(isset($_GET['search_word'])){
+    //検索を行った場合の遷移
+$sql='SELECT `f`.*,`u`.`name`, `u`.`img_name` FROM`feeds`AS `f` LEFT JOIN`users`AS `u`ON`f`.`user_id`=`u`.`id` WHERE `f`.`feed` LIKE "%"?"%" ORDER BY`f`.`created` DESC LIMIT '.CONTENT_PER_PAGE.' OFFSET '.$start;
+$data=[$_GET['search_word']];
+
+}else{
+
+    // echo'<pre>';
+    // var_dump($last_page);
+    // echo'</pre>';
 
 // 1投稿処理を全て取得
 $sql='SELECT `f`.*,`u`.`name`, `u`.`img_name` FROM`feeds`AS `f`LEFT JOIN`users`AS `u`ON`u`.`id`=`f`.`user_id`ORDER BY`f`.`created`DESC LIMIT '.CONTENT_PER_PAGE.' OFFSET '.$start;
+$data=[];
+}
+
 $stmt=$dbh->prepare($sql);
-$stmt->execute();
+$stmt->execute($data);
 
 // 投稿情報を全て入れる配列定義
 $feeds=[];
@@ -82,12 +92,15 @@ while(true){
     break;
   }
   $feeds[]=$record;
+    //その他の遷移
+}
+
 
 
 // echo'<pre>';
 // var_dump($signin_user);
 // echo'</pre>';
-}
+
 
 // FETCH（一つの行を取得すること）
 
