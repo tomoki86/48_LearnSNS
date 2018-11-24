@@ -21,13 +21,21 @@ while(true){
 if ($record==false){
     break;
     }
+// 各ユーザーのつぶやき数を取得
+$feed_sql = 'SELECT COUNT(*) AS `cnt` FROM `feeds` WHERE `user_id` = ?';
+$feed_data = [$record['id']];
+$feed_stmt = $dbh->prepare($feed_sql);
+$feed_stmt->execute($feed_data);
+$feed = $feed_stmt->fetch(PDO::FETCH_ASSOC);
+$record['feed_cnt'] = $feed['cnt'];
+
 $users[]=$record;
 }
 
-echo '<pre>';
-var_dump($users);
-echo '</pre>';
-
+// echo '<pre>';
+// var_dump($users);
+// echo '</pre>';
+$sq
 ?>
 <?php include('layouts/header.php'); ?>
 <body style="margin-top: 60px; background: #E4E6EB;">
@@ -49,7 +57,7 @@ echo '</pre>';
                     </div>
                     <div class="row feed_sub">
                         <div class="col-xs-12">
-                            <span class="comment_count">つぶやき数：10</span>
+                            <span class="comment_count">つぶやき数：<?php echo $user['feed_cnt']?></span>
                         </div>
                     </div>
                 </div>

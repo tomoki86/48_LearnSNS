@@ -91,11 +91,33 @@ while(true){
   if($record==false){
     break;
   }
-  $feeds[]=$record;
+
+  $comment_sql='SELECT `c`.*,`u`.`name`,`u`.`img_name`FROM `comments` AS`c`LEFT JOIN`users`AS`u`ON`c`.`user_id`=`u`.`id`WHERE`c`.`feed_id`=?';
+  $comment_data=[$record['id']];
+  $comment_stmt=$dbh->prepare($comment_sql);
+  $comment_stmt->execute($comment_data);
+  $comments=[];
+while(true){
+  $comment= $comment_stmt->fetch(PDO::FETCH_ASSOC);
+  if($comment==false){
+    break;
+    }
+
+  $comments[]=$comment;
     //その他の遷移
+
 }
+$record['comments']=$comments;
 
-
+$comment_cnt_sql = 'SELECT COUNT(*) AS `comment_cnt` FROM `comments` WHERE `feed_id` = ?';
+    $comment_cnt_data = [$record['id']];
+    $comment_cnt_stmt = $dbh->prepare($comment_cnt_sql);
+    $comment_cnt_stmt->execute($comment_cnt_data);
+    $comment_cnt_result = $comment_cnt_stmt->fetch(PDO::FETCH_ASSOC);
+    // 投稿の連想配列に新しくcomment_cntというキーを追加
+    $record['comment_cnt'] = $comment_cnt_result['comment_cnt'];
+    $feeds[] = $record;
+}
 
 // echo'<pre>';
 // var_dump($signin_user);
@@ -175,9 +197,6 @@ while(true){
 // var_dump($_POST)
 // die(); 
 
-// ()カッコ
-// []ブランケット、スクエアブランケット
-// {}カーリー
 
 ?>
 <?php include('layouts/header.php'); ?>
@@ -230,8 +249,9 @@ while(true){
                             <button class="btn btn-default">いいね！</button>
                             いいね数：
                             <span class="like-count">10</span>
-                            <a href="#collapseComment" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
-                            <span class="comment-count">コメント数：5</span>
+                            <a href="#collapseComment<?php echo $feed['id'];?>" data-toggle="collapse" aria-expanded="false"><span>コメントする</span></a>
+                            <!-- トグルオープンするのはbootstrapの機能 -->
+                            <span class="comment-count">コメント数：<?php echo $feed['comment_cnt']; ?></span>
                             <?php if($signin_user['id']==$feed['user_id']):?>
                                 <a href="edit.php?feed_id=<?php echo$feed['id'];?>" class="btn btn-success btn-xs">編集</a>
                                 <a onclick="return confirm('ほんとに消すの？');" href="delete.php?feed_id=<?php echo$feed['id'];?>" class="btn btn-danger btn-xs">削除</a>
