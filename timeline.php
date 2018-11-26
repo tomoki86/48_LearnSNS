@@ -219,7 +219,8 @@ $comment_cnt_sql = 'SELECT COUNT(*) AS `comment_cnt` FROM `comments` WHERE `feed
                 <div class="feed_form thumbnail">
                     <form method="POST" action="">
                         <div class="form-group">
-                            <textarea name="feed" class="form-control" rows="3" placeholder="happy" style="font-size: 24px;"></textarea><br>
+                            <textarea name="feed" class="form-control" 
+                            placeholder="happy" style="font-size: 24px;"></textarea><br>
                             <?php if(isset($errors['feed']) && $errors['feed']== 'blank'):?>
                             <p class ="text-danger">コメントを入力してください</p>
                             <?php endif ;?>
